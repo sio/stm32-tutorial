@@ -1,0 +1,592 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+        <link rel="next" href="../2-loop/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.7">
+    
+    
+      
+        <title>Часть 1: подключаем и исследуем плату - Осваимваем STM32 снизу</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.046329b4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href=".." title="Осваимваем STM32 снизу" class="md-header__button md-logo" aria-label="Осваимваем STM32 снизу" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Осваимваем STM32 снизу
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Часть 1: подключаем и исследуем плату
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Осваимваем STM32 снизу" class="md-nav__button md-logo" aria-label="Осваимваем STM32 снизу" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Осваимваем STM32 снизу
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Часть 1: подключаем и исследуем плату
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-loop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 2: пишем простейшую прошивку
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-blink/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 3: мигаем светодиодом
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-loopc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 4: Начинаем работать с C
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-blinkc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 5: Мигаем на C
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание раздела">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="1">Часть 1: подключаем и исследуем плату</h1>
+<p>Нам нужен компьютер, плата с микроконтроллером и программатор ST-Link.</p>
+<p>На компьютер нужно установить Arm GNU Toolchain. Его можно скачать
+<a href="https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads">тут</a>,
+возможно в вашем дистрибутиве уже есть готовые пакеты. У вас должна работать
+команда arm-none-eabi-gdb. Также нужно установить st-link
+(<a href="https://github.com/stlink-org/stlink">исходники</a>), он тоже есть во многих
+репозиториях. Я всё делал на линуксе, но в теории макось и винда тоже должны
+подойти.</p>
+<p>Программатор у меня - фирменный st-link, выломанный из фирменной платы Nucleo.
+Но больше распространены китайские st-link в виде флешки, они тоже довольно
+дёшевы.</p>
+<p>Программатор нужно подключить к компьютеру и выполнить команду
+<code>st-info --probe</code>. Он должен отобразить некоторую информацию о программаторе.
+Если у вас ошибка, попробуйте <code>sudo st-info --probe</code>. Если сработает, значит
+проблема с правами, разбирайтесь с udev, ну или работайте от рута.</p>
+<p>Плата у меня т.н. blue pill с микроконтроллером STM32F103C8T6. Это дешёвая и
+распространённая китайская плата. Насколько мне известно, на базовом уровне
+многие микроконтроллеры STM32 работают примерно одинаково, поэтому, надеюсь,
+информация будет частично применима и для других плат.</p>
+<p>У меня плата после покупки и подключению к компьютеру моргала синим диодом. То
+бишь в ней уже была какая-то простейшая прошивка для демонстрации
+работоспособности.</p>
+<p>Плату к программатору надо подключить тремя проводами: GND, SWCLK, SWDIO. Также
+плате нужно питание, лучше всего подать питание четвёртым проводом от
+программатора. На плате эти пины расположены с противоположной USB-разъёму
+стороне, на программаторе - согласно схемы, всё подписано, тут сложностей быть
+не должно.</p>
+<p>После того, как плата подключена к программатору, <code>st-info --probe</code> должен
+показать информацию о плате. Если на этом этапе проблемы, нужно их решить.</p>
+<p>Вот что выводит у меня:</p>
+<pre><code>st-info --probe
+Found 1 stlink programmers
+  version:    V2J29S18
+  serial:     066CFF494849887767255731
+  flash:      65536 (pagesize: 1024)
+  sram:       20480
+  chipid:     0x0410
+  descr:      F1xx Medium-density
+</code></pre>
+<p>Теперь попробуем подключиться к плате отладчиком. Это самое интересное. Для
+этого в одной вкладке терминала запускаем <code>st-util --connect-under-reset</code></p>
+<p>Он выведет что-то вроде</p>
+<pre><code>2023-09-08T17:26:46 WARN common.c: NRST is not connected
+2023-09-08T17:26:46 INFO common.c: F1xx Medium-density: 20 KiB SRAM, 64 KiB flash in at least 1 KiB pages.
+2023-09-08T17:26:46 INFO gdb-server.c: Listening at *:4242...
+</code></pre>
+<p>Что это предупреждение означает, я не знаю, если подключить ногу NRST от
+микроконтроллера к программатору, оно не исчезает. Но вроде всё работает,
+поэтому будем его игнорировать.</p>
+<p>Собственно видно: что st-util запустил TCP-сервер на порту 4242. К этому серверу
+будет подключаться gdb.</p>
+<p>Во второй вкладке запускаем <code>arm-none-eabi-gdb</code> (возможно обычный gdb тоже
+подойдёт, я не знаю, честно говоря, в чём отличие):</p>
+<pre><code>arm-none-eabi-gdb
+GNU gdb (Arm GNU Toolchain 12.3.Rel1 (Build arm-12.35)) 13.2.90.20230627-git
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type &quot;show copying&quot; and &quot;show warranty&quot; for details.
+This GDB was configured as &quot;--host=x86_64-pc-linux-gnu --target=arm-none-eabi&quot;.
+Type &quot;show configuration&quot; for configuration details.
+For bug reporting instructions, please see:
+&lt;https://bugs.linaro.org/&gt;.
+Find the GDB manual and other documentation resources online at:
+    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+
+For help, type &quot;help&quot;.
+Type &quot;apropos word&quot; to search for commands related to &quot;word&quot;.
+(gdb)
+</code></pre>
+<p>И дальше подключаемся к вышеупомянутому серверу:</p>
+<pre><code>(gdb) target remote 127.0.0.1:4242
+Remote debugging using 127.0.0.1:4242
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the &quot;file&quot; command.
+0x08000130 in ?? ()
+</code></pre>
+<p>Итак мы подключились отладчиком к плате. В последней строчке у вас скорей всего
+будет другой адрес.</p>
+<p>Теперь пару слов про то, как вообще работает этот микроконтроллер. Я, конечно,
+буду упускать много деталей, попытаюсь передать суть.</p>
+<p>Всё взаимодействие со всеми устройствами ведётся через адресное пространство (и
+прерывания) инструкциями чтения и записи памяти. Это 32-битный процессор, т.е.
+он может адресовать 4 ГиБ адресного пространства. Конечно памяти у него гораздо
+меньше, на моём устройстве 20 КиБ оперативной памяти и 64 КиБ флеш-памяти.
+Поэтому адресного пространства хватает и на оперативную память, и на
+флеш-память, и на все остальные периферийные устройства. Оперативная память
+начинается с адреса <code>0x2000_0000</code>, а флеш-память начинается с адреса
+<code>0x0800_0000</code>. Кроме того у микроконтроллера имеется несколько десятков
+периферийных устройств (ЦАП, АЦП, DMA-контролер, таймеры, устройства для
+ввода-вывода по различным протоколам и многое другое), каждому из которых
+назначены свои участки адресного пространства, через которые идёт взаимодействие
+с соответсвующим устройством.</p>
+<p>В дальнейшем я буду вольно обращаться с термином "память", обозначая им где-то
+адресное пространство, где-то оперативную память, где-то флеш память, из
+контекста должно быть понятно.</p>
+<p>Итак мы подали питание. У микроконтроллера есть два пина BOOT0 и BOOT1. На плате
+они настраиваются двумя перемычками. Есть три варианта загрузки, нас интересует
+загрузка из флеш-памяти. Для этого нужно выставить BOOT0 в <code>0</code> (т.е. соединить с
+«землёй»), на моей плате этому соответствует положение перемычки ближе к
+USB-порту. Посмотреть больше информации про это можно в Reference Manual, раздел
+3.4. В зависимости от выбранной конфигурации процессор делает доступным
+выбранное устройство загрузки по адресу <code>0x0000_0000</code>. Иными словами, когда мы
+грузимся с флеш-памяти, то адрес <code>0x0800_0000</code> (а также последующие адреса
+флеш-памяти) становится доступным и по адресу <code>0x0000_0000</code> . Далее процессор
+читает по адресу <code>0x0000_0000</code> 4 байта и присваивает это значение регистру sp
+(stack pointer, вершина стека). Далее процессор читает по адресу <code>0x0000_0004</code> 4
+байта и присваивает это значение регистру pc (program counter), иными словами
+делает переход по указанному адресу. Ну и, собственно, начинает работу. Читает
+инструкцию, выполняет и тд.</p>
+<p>Помимо этого у процессора есть возможность его отладки. Собственно что мы и
+сделали, подключив к нему программатор. В этом режиме он после инициализации
+ничего не начинает выполнять, а ждёт команды от отладчика. Кроме того отладчик
+может читать значения всех регистров, любого адреса оперативной памяти и тд.</p>
+<p>Собственно для начала прочитаем по 8 байтов по адресам <code>0x0000_0000</code> и
+<code>0x0800_0000</code>, убедимся, что они действительно совпадают, а также попробуем
+понять их смысл.</p>
+<pre><code>(gdb) x/2z 0x00000000
+0x0:    0x20004ffc  0x08000131
+(gdb) x/2z 0x08000000
+0x8000000:  0x20004ffc  0x08000131
+</code></pre>
+<p>Команда <code>x</code> (от слова eXamine) читает значения из памяти по указанному адресу.
+Суффикс <code>/2z</code> говорит о том, что мы хотим прочитать 2 слова (т.е. 4-байтовых
+значения) и напечатать их в 16-ричном формате.</p>
+<p>Как видно, по обоим адресам действительно лежат одинаковые данные. Иными
+словами, если верить описанию выше, то после инициализации регистру sp должно
+было присвоиться значение <code>0x2000_4ffc</code>, а регистру pc значение <code>0x0800_0131</code>.
+Сейчас мы этом проверим, а пока попробуем чуть-чуть похулиганить. На моей плате
+64 кибибайта флеша, поэтому попробуем прочитать пару слов в самом конце.</p>
+<pre><code>(gdb) x/2z 0x08000000 + 64 * 1024 - 4
+0x800fffc:  0xffffffff  Cannot access memory at address 0x8010000
+(gdb)
+</code></pre>
+<p>Собственно как и ожидалось: последнее слово ещё что-то содержит, а после него
+уже адреса недоступны для чтения. Поэтому командой x можно исследовать что
+угодно безо всяких опасений.</p>
+<p>Теперь проверим значения регистров:</p>
+<pre><code>(gdb) print/z $sp
+$1 = 0x20004ffc
+(gdb) print/z $pc
+$2 = 0x08000130
+</code></pre>
+<p>Для чтения значений используется команда <code>print</code>. Регистры доступны через
+синтаксис <code>$sp</code>, <code>$pc</code>, <code>$r0</code> и тд. Также все регистры можно посмотреть командой
+<code>info registers</code>. Важно понимать разницу между <code>print $sp</code> и <code>x $s</code>p. Первая
+команда печатает значение регистра, вторая команда значение регистра
+интерпретирует, как адрес и печатает значение из памяти.</p>
+<p>Со значением регистра <code>$sp</code> всё ожидаемо - он действительно загрузился из адреса
+<code>0x0000_0000</code>, а вот <code>$pc</code> оказался на единицу меньше. Тут можно много
+рассказывать, но это всё не очень интересно - просто запомните, что в
+архитектуре arm cortex адреса инструкций всегда чётные, при этом значения
+указателей иногда нечётные. Собственно адрес <code>0x0000_0004</code>, с которого начнётся
+выполнение, должен быть нечётным, при этом младший бит обнулится перед
+переходом. Также инструкции перехода <code>BX</code>, <code>BLX</code> требуют то же самое: младший
+бит адреса, на который выполняется переход, должен быть равен единице, но при
+этом переход делается на адрес с нулевым младшим битом. А команды <code>B</code> и <code>BL</code> не
+требуют, вот такая особенность.</p>
+<p>В итоге процессор перешёл на адрес <code>0x0800_0130</code> и остановился в ожидании команд
+от отладчика. На вашей плате скорей всего все эти значения будут немного
+другими, я «заводскую» прошивку стёр, но принцип ровно тот же. На всякий случай
+напомню, что по адресу <code>0x0800_0130</code> у нас доступна флеш-память, т.е. это код из
+флеш-памяти.</p>
+<p>Теперь можно попробовать дизассемблировать инструкцию, которая сейчас будет
+выполняться:</p>
+<pre><code>(gdb) x/i $pc
+=&gt; 0x8000130:   add.w   r0, r0, #1
+</code></pre>
+<p>Как видно, для дизассемблирования используется та же команда <code>x</code>. Только вместо
+<code>/z</code> используется формат <code>/i</code>. <code>z</code> это шестнадцатеричный формат, <code>i</code> это
+интерпретация числа, как инструкции. Для интереса покажу ещё несколько форматов,
+думаю, всё и так очевидно.</p>
+<pre><code>(gdb) x/z $pc
+0x8000130:  0x0001f100
+(gdb) x/d $pc
+0x8000130:  127232
+(gdb) x/x $pc
+0x8000130:  0x0001f100
+(gdb) x/t $pc
+0x8000130:  00000000000000011111000100000000
+</code></pre>
+<p>Форматы <code>/z</code> и <code>/x</code> означают одно и то же, но в некоторых случаях <code>/x</code> не
+добавляет нули слева, а <code>/z</code> всегда добавляет нули.</p>
+<p>Иными словами 4 байта <code>01 00 f1 00</code> процессором интерпретируются, как команда
+<code>add.w r0, r0, #1</code>. Эта команда аналогична псевдокоду <code>r0 := r0 + 1</code>.</p>
+<p>Важно понимать, что эта команда ещё не выполнена, процессор только готовится её
+выполнить.</p>
+<p>Теперь распечатаем значение регистра <code>r0</code>, далее выполним команду и распечатаем
+значение регистра ещё раз.</p>
+<pre><code>(gdb) p/z $r0
+$6 = 0x48b503b6
+(gdb) stepi
+0x08000134 in ?? ()
+(gdb) p/z $r0
+$7 = 0x48b503b7
+</code></pre>
+<p>Как видно, в регистре <code>r0</code> было какое-то непонятное значение и процессор
+действительно увеличил это значение в регистре <code>r0</code> на единицу. После команды
+<code>stepi</code> процессор перешёл на 4 байта вперёд и готовится выполнить следующую
+команду. Посмотрим, что там за команда.</p>
+<pre><code>x/i $pc
+=&gt; 0x8000134:   b.w 0x8000130
+</code></pre>
+<p>Это команда branch, команда безусловного перехода по указанному адресу. Если её
+выполнить, то процессор вернётся на предыдущую инструкцию. Так и будет туда-сюда
+прыгать, считая от 0 до 4 миллиардов по кругу, пока не выключим питание или не
+нажмём кнопку reset.</p>
+<p>В псевдокоде эта программа выглядит примерно так:</p>
+<pre><code>loop: r0 := r0 + 1;
+goto loop;
+</code></pre>
+<p>В дальнейшем программы на языке ассемблера будут иллюстрироваться псевдоком.</p>
+<p>На вашей плате из магазина программа будет другая. Но принципы работы те же.</p>
+<p>На этом первая часть закончена. Мы запустили плату, подключились к ней и
+убедились, что там внутри действительно процессор, а не неонка.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      
+    
+  </body>
+</html>

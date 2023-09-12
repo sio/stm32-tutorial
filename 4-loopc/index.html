@@ -1,0 +1,798 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../3-blink/">
+      
+      
+        <link rel="next" href="../5-blinkc/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.7">
+    
+    
+      
+        <title>Часть 4: Начинаем работать с C - Осваимваем STM32 снизу</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.046329b4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#4-c" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href=".." title="Осваимваем STM32 снизу" class="md-header__button md-logo" aria-label="Осваимваем STM32 снизу" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Осваимваем STM32 снизу
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Часть 4: Начинаем работать с C
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Осваимваем STM32 снизу" class="md-nav__button md-logo" aria-label="Осваимваем STM32 снизу" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Осваимваем STM32 снизу
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-explore/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 1: подключаем и исследуем плату
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-loop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 2: пишем простейшую прошивку
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-blink/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 3: мигаем светодиодом
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Часть 4: Начинаем работать с C
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-blinkc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 5: Мигаем на C
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание раздела">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="4-c">Часть 4: Начинаем работать с C</h1>
+<p>Знание ассемблера важно, но многие программы разумней писать на C. В этой части
+мы напишем простую программу на C, скомпилируем её, исследуем получившийся
+объектный файл, правильно скомпонуем и запустим. После этого ещё немного изучим
+gdb.</p>
+<p>Вот наша простая программа:</p>
+<p><code>loopc.c</code></p>
+<pre><code class="language-c">#include &lt;stdint.h&gt;
+
+static const uint32_t loop_start = 0x12345678;
+static const uint32_t loop_increment = 3;
+static uint32_t loop_value_1 = loop_start;
+static uint32_t loop_value_2;
+
+void start(void)
+{
+    for (;;)
+    {
+        loop_value_2 = loop_value_1 + loop_increment;
+        loop_value_1 = loop_value_2;
+    }
+}
+</code></pre>
+<p>В этой программе имеются следующие элементы:</p>
+<ol>
+<li>Глобальные константы.</li>
+<li>Инициализированная глобальная переменная.</li>
+<li>Неинициализированная глобальная переменная.</li>
+<li>Ну и, конечно, код.</li>
+</ol>
+<p>Скомпилируем эту программу:</p>
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -g -O0 -c -o loopc.o loopc.c
+</code></pre>
+<p>Параметр <code>-mcpu=cortex-m3</code> указывает компилятору, что мы хотим сгенерировать код
+для ARM Cortex M3.</p>
+<p>Параметр <code>-g</code> указвыает компилятору, что мы хотим добавить в объектный файл
+отладочную информацию. Она пригодится поздней, когда мы будем запускать
+программу под отладкой.</p>
+<p>Параметр <code>-O0</code> указывает компилятору, что мы не хотим оптимизировать код. Для
+реальных программ стоит указывать параметр <code>-Os</code>, <code>-O2</code> или <code>-O3</code>, в зависимости
+от того, хотите ли вы оптимизировать выходной код по размеру или скорости. Но
+для нашего случая оптимизация совсем ни к чему и только помешает.</p>
+<p>Параметр <code>-c</code> указывает компилятору, что мы хотим только скомпилировать файл.
+Без него компилятор вызовет линкер, это нам не нужно.</p>
+<p>После компиляции исследуем получившийся объектный файл:</p>
+<pre><code>arm-none-eabi-objdump -D loopc.o
+
+loopc.o:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 &lt;start&gt;:
+   0:   b480        push    {r7}
+   2:   af00        add r7, sp, #0
+   4:   4b05        ldr r3, [pc, #20]   @ (1c &lt;start+0x1c&gt;)
+   6:   681b        ldr r3, [r3, #0]
+   8:   2203        movs    r2, #3
+   a:   4413        add r3, r2
+   c:   4a04        ldr r2, [pc, #16]   @ (20 &lt;start+0x20&gt;)
+   e:   6013        str r3, [r2, #0]
+  10:   4b03        ldr r3, [pc, #12]   @ (20 &lt;start+0x20&gt;)
+  12:   681b        ldr r3, [r3, #0]
+  14:   4a01        ldr r2, [pc, #4]    @ (1c &lt;start+0x1c&gt;)
+  16:   6013        str r3, [r2, #0]
+  18:   e7f4        b.n 4 &lt;start+0x4&gt;
+  1a:   bf00        nop
+    ...
+
+Disassembly of section .data:
+
+00000000 &lt;loop_value_1&gt;:
+   0:   12345678    eorsne  r5, r4, #120, 12    @ 0x7800000
+
+Disassembly of section .bss:
+
+00000000 &lt;loop_value_2&gt;:
+   0:   00000000    andeq   r0, r0, r0
+
+Disassembly of section .rodata:
+
+00000000 &lt;loop_start&gt;:
+   0:   12345678    eorsne  r5, r4, #120, 12    @ 0x7800000
+
+00000004 &lt;loop_increment&gt;:
+   4:   00000003    andeq   r0, r0, r3
+
+...
+</code></pre>
+<p>Нас интересуют первые четыре секции: <code>.text</code>, <code>.data</code>, <code>.bss</code> и <code>.rodata</code>.
+Остальные секции содержат отладочную и прочую служебную инфомацию и в конечный
+файл не попадут.</p>
+<p>Как видно, секция <code>.text</code> содержит машинный код нашей функции. Компилятор без
+оптимизации компилирует весьма многословный код и разбираться в нём мы не будем,
+хотя в целом там нет ничего сложного.</p>
+<p>Секция <code>.data</code> содержит инициализированные глобальные переменные. В нашем случае
+это переменная loop_value_1.</p>
+<p>Секция <code>.bss</code> содержит неинициализированные глобальные переменные. В нашем
+случае это переменная loop_value_2.</p>
+<p>Секция <code>.rodata</code> содержит константы. В нашем случае это константы loop_start и
+loop_increment.</p>
+<p>Теперь давайте подумаем, как эти секции должны располагаться в памяти. Секция
+<code>.text</code> по смыслу полностью аналогична секции <code>code</code> из второй части. Её мы
+просто запишем на флеш-память после таблицы векторов. Секция <code>.rodata</code> по сути
+ничем не отличается, её тоже запишем на флеш-память. Секция <code>.bss</code> содержит
+переменные. Для работы с переменными нужно использовать SRAM, поэтому секция
+<code>.bss</code> будет расположена именно там. Инициализировать её не надо, поэтому
+никаких дополнительных действий не потребуется.</p>
+<p>А вот с секцией <code>.data</code> всё совсем непросто. С одной стороны эта секция содержит
+переменные, поэтому её нужно расположить в SRAM. С другой стороны эти переменные
+при старте программы должны быть инициализированы определёнными значениями,
+которые мы указали в тексте программы. Но когда наша программа запускается,
+содержимое SRAM не определено, а эти начальные значения можно сохранить только
+во флеш-памяти.</p>
+<p>Решение тут такое:</p>
+<ol>
+<li>Секцию <code>.data</code> нужно разместить во флеш-памяти, чтобы там хранились
+   инициализированные значения.</li>
+<li>Также секцию <code>.data</code> нужно разместить в SRAM и все адреса в коде должны
+   указывать именно в SRAM.</li>
+<li>Необходимо в самом начале работы программы, ещё перед вызовом нашей функции
+   <code>start</code> скопировать секцию <code>.data</code> из флеш-памяти в SRAM.</li>
+</ol>
+<p>Для этого мы напишем код на языке ассемблера, который будет вызван в самом
+начале, скопирует секцию <code>.data</code> и передаст управление нашей функции на C.</p>
+<p>Вот наш линкер скрипт:</p>
+<p><code>linker.ld</code>:</p>
+<pre><code>MEMORY
+{
+    Flash : ORIGIN = 0x08000000, LENGTH = 64K
+    SRAM : ORIGIN = 0x20000000, LENGTH = 20K
+}
+
+SECTIONS {
+    .isr_vector :
+    {
+        LONG(0x20000000 + 20K);
+        LONG(_startup | 1);
+        . = 0x130;
+    } &gt; Flash
+
+    .text :
+    {
+        . = ALIGN(4);
+        *(.text)
+        . = ALIGN(4);
+    } &gt; Flash
+
+    .rodata :
+    {
+        . = ALIGN(4);
+        *(.rodata)
+        . = ALIGN(4);
+    } &gt; Flash
+
+    .bss : {
+        . = ALIGN(4);
+        *(.bss)
+        . = ALIGN(4);
+    } &gt; SRAM
+
+    .data : {
+        . = ALIGN(4);
+        _flash_data_start = LOADADDR(.data);
+        _sram_data_start = .;
+        *(.data)
+        _sram_data_end = .;
+        . = ALIGN(4);
+    } &gt; SRAM AT&gt; Flash
+}
+</code></pre>
+<p>Он уже гораздо сложней предыдущих. Во-первых в нём появился раздел <code>MEMORY</code>, в
+котором описываются регионы памяти. Без них нам не расположить <code>.data</code> в двух
+местах. Во-вторых мы добавили множество выходных секций с именами, идентичными
+входным. В-третьих мы добавили инструкции <code>. = ALIGN(4);</code>, которые выравнивают
+начало и конец каждой выходной секции по границе, кратной четырём байтам. И
+в-чётвёртых у нас появилась довольно сложная секция <code>.data</code>. Давайте разберём её
+по строчкам.</p>
+<p>Начнём с последней строчки: <code>&gt; SRAM AT&gt; Flash</code>. Эта строчка означает, что секция
+располагается в регионе <code>SRAM</code>, но загружается в регион <code>Flash</code>. Что значит
+"располагается в регионе <code>SRAM</code>"? Это означает, что все указатели, которые
+ссылаются на эту секцию, после компоновки будут указывать в <code>SRAM</code>. Иными
+словами, когда наша программа будет менять значения переменной <code>loop_value_1</code>,
+она будет это делать в SRAM, а не пытаться менять значения во флеш-памяти. А что
+значит "загружается в регион <code>Flash</code>"? Это означает, что в выходном файле
+значения, которыми должны инициализироваться переменные, будут записаны во
+флеш-память.</p>
+<p>На выравниваниях не будем останавливаться, тут ничего сложного. Посмотрим на
+строчку <code>_flash_data_start = LOADADDR(.data)</code>. Эта строчка объявляет символ
+<code>_flash_data_start</code> и присваивает ему адрес начала секции <code>.data</code> во
+флеш-памяти. Далее идёт строчка <code>_sram_data_start = .</code>. Она объявляет символ
+<code>_sram_data_start</code> и присваивает ему адрес начала секции <code>.data</code> в SRAM. Потом
+идёт <code>*(.data)</code>, с этим синтаксисом мы уже знакомы, все секции с именем <code>.data</code>
+из всех входных файлов (в нашем случае это только <code>loopc.o</code>) будут скопированы в
+выходную секцию <code>.data</code>. И наконец идёт строчка <code>_sram_data_end = .</code>. Она
+объявляет символ <code>_sram_data_end</code> и присваивает ему адрес конца секции <code>.data</code> в
+SRAM.</p>
+<p>В дальнейшем мы сможем использовать значения символов <code>_flash_data_start</code>,
+<code>_sram_data_start</code> и <code>_sram_data_end</code> в коде, который будет копировать начальные
+значения для переменных из секции <code>.data</code> из флеш-памяти в SRAM.</p>
+<p>Важно понимать, что все эти символы вычисляются линкером во время компоновки
+конечного файла и в нём будут присутствовать в виде готовых констант. Как,
+наверное, уже видно, линкер начинает выполнять весьма нетривиальную роль. И если
+в прошлых программах при большом желании без него можно было бы и обойтись,
+собрав конечный файл по кусочкам, то в этой программе без линкера никуда.</p>
+<p>Выполнение программы начинается с кода, адрес которого обозначен символом
+<code>_reset_exception_handler</code>, а наш код на C объявляет функцию <code>start</code>. Задача
+кода <code>_reset_exception_handler</code> состоит в инициализации секции <code>.data</code> и
+переходу к <code>start</code>. Стоит отметить, что использование переменных с
+подчёркиванием в коде на C не рекомендуется, все переменные такого рода
+считаются зарезервированными для деталей реализации. Именно поэтому мы и
+объявляем такие символы, в корректном коде на C они не должны появиться. Если бы
+мы использовали имя <code>reset_exception_handler</code> или <code>flash_data_start</code>, то в коде
+на C ничего бы не мешало объявить функцию с таким же именем, и получилась бы
+неприятная коллизия. Конечно в нашем простом случае это не случится, но в общем
+случае стоит иметь это в виду. Наш линкер и наш будущий код инициализации секции
+<code>.data</code> как раз относятся к таким деталям реализации.</p>
+<p>Итак пора написать код <code>_reset_exception_handler</code>. Мы это сделаем на языке
+ассемблера, чтобы к моменту запуска кода на C всё уже было инициализировано и
+готово к использованию.</p>
+<p><code>reset_exception_handler.s</code>:</p>
+<pre><code>.cpu cortex-m3
+.syntax unified
+.thumb
+
+.global _reset_exception_handler
+
+.text
+
+_reset_exception_handler:
+ldr r0, =_flash_data_start
+ldr r1, =_sram_data_start
+ldr r2, =_sram_data_end
+
+copy_loop:
+cmp r1, r2
+bge end_copy
+ldr r3, [r0], #4
+str r3, [r1], #4
+b copy_loop
+
+end_copy:
+b start
+</code></pre>
+<p>Псевдокод, соответствующий этому коду, выглядит так:</p>
+<pre><code>_reset_exception_handler:
+r0 := _flash_data_start
+r1 := _sram_data_start
+r2 := _sram_data_end
+
+copy_loop:
+if r1 &gt;= r2 then goto end_copy
+r3 := [r0]
+r0 := r0 + 4
+[r1] := r3
+r1 := r1 + 4
+goto copy_loop
+
+end_copy:
+goto start
+</code></pre>
+<p>Работа по программированию на этом закончена. <code>Makefile</code> приводить не будем, там
+всё тривиально. Соберём программу, прошьём её в микроконтроллер и приступим к
+отладке:</p>
+<pre><code>$ make flash
+arm-none-eabi-gcc -mcpu=cortex-m3 -g -O0 -c -o loopc.o loopc.c
+arm-none-eabi-ld -T linker.ld -o loopc.elf reset_exception_handler.o loopc.o
+arm-none-eabi-objcopy -O binary loopc.elf loopc.bin
+st-flash write loopc.bin 0x08000000
+st-flash 1.7.0
+...
+2023-09-11T23:48:28 INFO common.c: Flash written and verified! jolly good!
+
+$ st-util --connect-under-reset
+st-util
+2023-09-11T23:50:13 WARN common.c: NRST is not connected
+2023-09-11T23:50:13 INFO common.c: F1xx Medium-density: 20 KiB SRAM, 64 KiB flash in at least 1 KiB pages.
+2023-09-11T23:50:13 INFO gdb-server.c: Listening at *:4242...
+</code></pre>
+<pre><code>$ arm-none-eabi-gdb
+GNU gdb (Arm GNU Toolchain 12.3.Rel1 (Build arm-12.35)) 13.2.90.20230627-git
+...
+(gdb) target remote 127.0.0.1:4242
+Remote debugging using 127.0.0.1:4242
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the &quot;file&quot; command.
+0x08000130 in ?? ()
+</code></pre>
+<p>Значение регистра $pc должно быть равно <code>0x08000130</code>.</p>
+<p>Теперь загрузим программу, чтобы gdb мог прочитать символы и отладочную
+информацию:</p>
+<pre><code>(gdb) symbol-file loopc.elf
+Reading symbols from loopc.elf...
+</code></pre>
+<p>У gdb есть очень полезная команда <code>display</code>. Мы ей указываем формат и выражение,
+аналогично команде <code>print</code>, а она распечатывает это выражение при каждом шаге
+программы. Воспользуемся этой командой для того, чтобы дизассемблировать
+выполняющийся код:</p>
+<pre><code>(gdb) display/6i $pc - 2
+1: x/6i $pc - 2
+   0x800012e:   movs    r0, r0
+=&gt; 0x8000130 &lt;_reset_exception_handler&gt;:    ldr r0, [pc, #20]   @ (0x8000148 &lt;end_copy+4&gt;)
+   0x8000132 &lt;_reset_exception_handler+2&gt;:  ldr r1, [pc, #24]   @ (0x800014c &lt;end_copy+8&gt;)
+   0x8000134 &lt;_reset_exception_handler+4&gt;:  ldr r2, [pc, #24]   @ (0x8000150 &lt;end_copy+12&gt;)
+   0x8000136 &lt;copy_loop&gt;:   cmp r1, r2
+   0x8000138 &lt;copy_loop+2&gt;: bge.n   0x8000144 &lt;end_copy&gt;
+</code></pre>
+<p>Можно распознать в этом коде содержимое файла startup.s. Также можно обратить
+внимание, что рядом с адресами появились имена символов, которые соответствуют
+этим адресам.</p>
+<p>Сделаем шаг:</p>
+<pre><code>(gdb) stepi
+0x08000132 in _reset_exception_handler ()
+1: x/6i $pc - 2
+   0x8000130 &lt;_reset_exception_handler&gt;:    ldr r0, [pc, #20]   @ (0x8000148 &lt;end_copy+4&gt;)
+=&gt; 0x8000132 &lt;_reset_exception_handler+2&gt;:  ldr r1, [pc, #24]   @ (0x800014c &lt;end_copy+8&gt;)
+   0x8000134 &lt;_reset_exception_handler+4&gt;:  ldr r2, [pc, #24]   @ (0x8000150 &lt;end_copy+12&gt;)
+   0x8000136 &lt;copy_loop&gt;:   cmp r1, r2
+   0x8000138 &lt;copy_loop+2&gt;: bge.n   0x8000144 &lt;end_copy&gt;
+   0x800013a &lt;copy_loop+4&gt;: ldr.w   r3, [r0], #4
+</code></pre>
+<p>Как и ожидалось, команда <code>display</code> распечатала обновлённый код. Теперь нажмём
+<code>&lt;Enter&gt;</code> ничего не вводя:</p>
+<pre><code>(gdb)
+0x08000134 in _reset_exception_handler ()
+1: x/6i $pc - 2
+   0x8000132 &lt;_reset_exception_handler+2&gt;:  ldr r1, [pc, #24]   @ (0x800014c &lt;end_copy+8&gt;)
+=&gt; 0x8000134 &lt;_reset_exception_handler+4&gt;:  ldr r2, [pc, #24]   @ (0x8000150 &lt;end_copy+12&gt;)
+   0x8000136 &lt;copy_loop&gt;:   cmp r1, r2
+   0x8000138 &lt;copy_loop+2&gt;: bge.n   0x8000144 &lt;end_copy&gt;
+   0x800013a &lt;copy_loop+4&gt;: ldr.w   r3, [r0], #4
+</code></pre>
+<p>Это повторило предыдущую инструкцию и сделало ещё один шаг вперёд. Можно
+увидеть, что после того, как startup скопирует нашу секцию <code>.data</code>, он перейдёт
+на инструкцию по адресу <code>0x0800_0144</code> с символов end_copy. Не будем шагать
+дальше, а поставим отладочную точку (breakpoint, брейкпоинт) на этот адрес и
+запустим выполнение программы до остановки:</p>
+<pre><code>(gdb) break end_copy
+Breakpoint 1 at 0x8000144
+Note: automatically using hardware breakpoints for read-only addresses.
+(gdb) continue
+Continuing.
+
+Breakpoint 1, 0x08000144 in end_copy ()
+1: x/6i $pc - 2
+   0x8000142 &lt;copy_loop+12&gt;:    b.n 0x8000136 &lt;copy_loop&gt;
+=&gt; 0x8000144 &lt;end_copy&gt;:    b.w 0x8000154 &lt;start&gt;
+   0x8000148 &lt;end_copy+4&gt;:  lsls    r0, r0, #6
+   0x800014a &lt;end_copy+6&gt;:  lsrs    r0, r0, #32
+   0x800014c &lt;end_copy+8&gt;:  movs    r4, r0
+   0x800014e &lt;end_copy+10&gt;: movs    r0, #0
+</code></pre>
+<p>Следующей инструкцей мы перейдём уже в скомпилированный код функции <code>start</code>. А
+перед этим проверим, действительно ли секция <code>.data</code> в SRAM инициализирована.</p>
+<pre><code>(gdb) print/z &amp;_flash_data_start
+$1 = 0x08000180
+(gdb) print/z &amp;_sram_data_start
+$2 = 0x20000004
+(gdb) print/z &amp;_sram_data_end
+$3 = 0x20000008
+(gdb) x/z 0x08000180
+0x8000180:  0x12345678
+(gdb) x/z 0x20000004
+0x20000004 &lt;loop_value_1&gt;:  0x12345678
+</code></pre>
+<p>Видно, что значение <code>0x1234_5678</code> действительно было скопировано с флеш-памяти
+по адресу <code>0x0800_0180</code> в SRAM по адресу <code>0x2000_0004</code>. Также gdb знает про
+символ <code>loop_value_1</code>, т.е. переменную из кода на C.</p>
+<p>Теперь перейдём в функцию start:</p>
+<pre><code>(gdb) stepi
+start () at loopc.c:9
+9   {
+1: x/6i $pc - 2
+   0x8000152 &lt;end_copy+14&gt;: movs    r0, #0
+=&gt; 0x8000154 &lt;start&gt;:   push    {r7}
+   0x8000156 &lt;start+2&gt;: add r7, sp, #0
+   0x8000158 &lt;start+4&gt;: ldr r3, [pc, #20]   @ (0x8000170 &lt;start+28&gt;)
+   0x800015a &lt;start+6&gt;: ldr r3, [r3, #0]
+   0x800015c &lt;start+8&gt;: movs    r2, #3
+</code></pre>
+<p>Обратите внимание, что произошла очень важная вещь. gdb распечатал название
+нашей функции <code>start</code>, название файла, где эта функция определена <code>loopc.c</code> и
+номер строки <code>9</code>.</p>
+<p>Командой <code>list</code> можно распечетать исходный код в окрестности выполняемого кода:</p>
+<pre><code>(gdb) list
+4   static const uint32_t loop_increment = 3;
+5   static uint32_t loop_value_1 = loop_start;
+6   static uint32_t loop_value_2;
+7
+8   void start(void)
+9   {
+10      for (;;)
+11      {
+12          loop_value_2 = loop_value_1 + loop_increment;
+13          loop_value_1 = loop_value_2;
+</code></pre>
+<p>Теперь можно убрать отображение дизассемблированного кода и добавить отображение
+значений переменных из кода на C:</p>
+<pre><code>(gdb) delete display 1
+(gdb) display loop_value_1
+2: loop_value_1 = 305419896
+(gdb) display loop_value_2
+3: loop_value_2 = 306559500
+</code></pre>
+<p>Далее будем вместо команды <code>stepi</code> (step instruction) использовать команду
+<code>step</code>, которая шагает по строкам C, а не отдельным инструкциям.</p>
+<pre><code>(gdb) step
+12          loop_value_2 = loop_value_1 + loop_increment;
+2: loop_value_1 = 305419896
+3: loop_value_2 = 306559500
+(gdb) step
+13          loop_value_1 = loop_value_2;
+2: loop_value_1 = 305419896
+3: loop_value_2 = 305419899
+(gdb) step
+12          loop_value_2 = loop_value_1 + loop_increment;
+2: loop_value_1 = 305419899
+3: loop_value_2 = 305419899
+</code></pre>
+<p>На этом данную часть можно считать завершённой. Мы научились компилировать и,
+что куда более важно, компоновать код на C, а также отлаживать его.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      
+    
+  </body>
+</html>

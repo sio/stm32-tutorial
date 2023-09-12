@@ -1,0 +1,711 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../1-explore/">
+      
+      
+        <link rel="next" href="../3-blink/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.7">
+    
+    
+      
+        <title>Часть 2: пишем простейшую прошивку - Осваимваем STM32 снизу</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.046329b4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#2" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href=".." title="Осваимваем STM32 снизу" class="md-header__button md-logo" aria-label="Осваимваем STM32 снизу" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Осваимваем STM32 снизу
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Часть 2: пишем простейшую прошивку
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Осваимваем STM32 снизу" class="md-nav__button md-logo" aria-label="Осваимваем STM32 снизу" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Осваимваем STM32 снизу
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-explore/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 1: подключаем и исследуем плату
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Часть 2: пишем простейшую прошивку
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-blink/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 3: мигаем светодиодом
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-loopc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 4: Начинаем работать с C
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-blinkc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Часть 5: Мигаем на C
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание раздела">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="2">Часть 2: пишем простейшую прошивку</h1>
+<p>Вообще говоря, прошивка уже была описана в первой части. Нам нужно создать такой
+файл, в котором будет записано некое число из четырёх байтов, которое процессор
+присвоит регистру sp, далее там будет записан, к примеру, адрес <code>0x08000131</code> в
+следующих четырёх байтах, далее будут располагаться 296 нулевых байтов (0x130 -
+4 - 4 = 304 - 4 - 4 = 296), а за ними 2 инструкции по 4 байта, которые и будут
+что-то делать. Итого файл прошивки должен занимать 4 + 4 + 296 + 4 + 4 = 312
+байтов. Содержимое этого файла мы запишем в микроконтроллер по адресу
+0x08000000, где и располагается флеш-память.</p>
+<p>Первое, что мы сделаем - напишем, собственно, код на языке ассемблера, который
+соберём в объектный файл:</p>
+<p><code>loop.s</code>:</p>
+<pre><code>.cpu cortex-m3
+.syntax unified
+.thumb
+
+.global reset_exception_handler
+
+.section code
+
+reset_exception_handler:
+add r0, r0, 1
+bl reset_exception_handler
+</code></pre>
+<p>Всё, что начинается с точки - является директивами ассемблера и непосредственно
+в код не преобразовывается.</p>
+<p>Первые 3 строчки это некое мумбо-юмбо, которое объяснить кратко вряд ли
+получится. Самая первая строчка говорит о том, что у нас код для процессора
+cortex-m3. Это семейство ARM-процессоров, одним из представителей которого и
+является процессор STM32F103. Почитайте мануал, если интересно, но кроличья нора
+там глубока. Проще просто запомнить.</p>
+<p><code>.global reset_exception_handler</code> говорит о том, что мы хотим экспортировать из
+этого файла символ с именем <code>reset_exception_handler</code>. Каждый объектный файл
+обычно экспортирует какие-то символы. Чаще всего символ можно воспринимать, как
+указатель.</p>
+<p>Далее идёт директива <code>.section code</code>. Объектный файл это по сути набор секций, в
+каждой секции лежат данные. В нашем случае объектный файл будет содержать одну
+секцию с названием <code>code</code>, в которой будут лежать 2 инструкции (8 байтов). А
+также символ <code>reset_exception_handler</code>, который будет указывать на первую
+инструкцию (по сути он будет равен нулю).</p>
+<p><code>reset_exception_handler:</code> это тоже не код, хоть и не начинается на точку. Это
+метка, или символ, как угодно.</p>
+<p>А дальше, наконец-то, идёт код, ради которого всё и затевалось. Две инструкции:
+инкрементировать значение в регистре <code>r0</code> и перейти на предыдущую инструкцию, в
+начало цикла.</p>
+<p>Для того, чтобы собрать этот код в объектный файл, используется программа <code>as</code>
+(ассемблер). А точней <code>arm-none-eabi-as</code>:</p>
+<pre><code>$ arm-none-eabi-as -o loop.o loop.s
+</code></pre>
+<p>Файл <code>loop.o</code> является объектным файлом в формате ELF. Его можно посмотреть с
+помощью программ objdump и nm:</p>
+<pre><code>$ arm-none-eabi-nm -g blink.o
+00000000 N reset_exception_handler
+
+$ arm-none-eabi-objdump -D blink.o
+
+blink.o:     file format elf32-littlearm
+
+
+Disassembly of section code:
+
+00000000 &lt;reset_exception_handler&gt;:
+   0:   f100 0001   add.w   r0, r0, #1
+   4:   f7ff fffe   bl  0 &lt;reset_exception_handler&gt;
+
+Disassembly of section .ARM.attributes:
+
+00000000 &lt;.ARM.attributes&gt;:
+   0:   00002041    andeq   r2, r0, r1, asr #32
+   4:   61656100    cmnvs   r5, r0, lsl #2
+   8:   01006962    tsteq   r0, r2, ror #18
+   c:   00000016    andeq   r0, r0, r6, lsl r0
+  10:   726f4305    rsbvc   r4, pc, #335544320  @ 0x14000000
+  14:   2d786574    cfldr64cs   mvdx6, [r8, #-464]! @ 0xfffffe30
+  18:   0600334d    streq   r3, [r0], -sp, asr #6
+  1c:   094d070a    stmdbeq sp, {r1, r3, r8, r9, sl}^
+  20:   Address 0x20 is out of bounds.
+</code></pre>
+<p>Как видно из вывода <code>nm</code>, в этом файле экспортируется один символ
+<code>reset_exception_handler</code> со значением <code>0</code>.</p>
+<p>С выводом <code>objdump</code> посложней. В файле находится две секции: <code>code</code> и
+<code>.ARM.attributes</code>. <code>code</code> это то, что мы объявили. В нём 8 байтов, которые нам
+любезно дизассемблировали. Секция <code>.ARM.attributes</code> содержит служебные сведения,
+которые в конечной прошивке не появятся, поэтому её можно игнорировать. objdump
+попытался эти сведения дизассемблировать, но на самом деле это не машинный код,
+а просто формат такой. <code>objdump -D</code> пытается всё дизассембировать, даже если это
+не имеет смысла.</p>
+<p>У нас теперь есть 8 байтов нашего кода, но нужно скомпоновать всё остальное.
+Конечно можно в каком-нибудь <code>hex</code>-редакторе это сделать вручную, но вообще для
+этого используется компоновщик (linker, далее линкер). В составе GNU binutils
+имеется линкер ld, его мы и будем использовать, а точней его версию для ARM
+<code>arm-none-eabi-ld</code>.</p>
+<p>Линкер также использует свой особый язык: linker script. По сути задача линкера
+состоит в следующем: он получает на вход набор объектных файлов (в нашем случае
+это один файл <code>loop.o</code>). В каждом из этих файлов есть некоторое множество секций
+и символов. В секциях есть какие-то данные: код, начальные значения переменных и
+тд. Они называются в терминах линкера входные секции (input sections). На выходе
+у линкера тоже объектный файл, и в нём тоже некоторый набор секций и символов:
+выходные секции (output sections). У нас задача простая, поэтому выходная секция
+будет ровно одна, с интересующими нас данными, которые будут прошиваться в
+микроконтроллер.</p>
+<p>Вот такой скрипт для линкера мы будем использовать:</p>
+<p><code>loop.ld</code>:</p>
+<pre><code>SECTIONS {
+    flash 0x08000000 : {
+        LONG(0x20000000 + 20K);
+        LONG(reset_exception_handler | 1);
+        . = 0x130;
+        loop.o(code)
+    }
+}
+</code></pre>
+<p><code>SECTIONS</code> объявляет выходные секции. <code>flash</code> это название нашей выходной
+секции. Можно называть её как угодно. <code>0x0800 0000</code> это адрес, по которому эта
+секция будет располагаться в памяти. Это необходимо для того, чтобы линкер
+правильно подсчитал смещения. Из <code>loop.o</code> мы экспортируем сивол
+<code>reset_exception_handler</code> со значением 0, но на самом деле в конечной прошивке у
+него будет значение <code>0x0800 0130</code>.</p>
+<p><code>LONG(0x20000000 + 20K);</code> запишет по первому адресу в данной секции 4-х байтовое
+значение, которое процессор присвоит регистру <code>sp</code>. В принципе по выражению
+очевидно, что мы ему присваиваем значение адреса сразу за окончанием адресного
+пространства оперативной памяти. Чуть ниже будет попытка объяснить, почему
+именно такое значение.</p>
+<p><code>LONG(reset_exception_handler | 1);</code> запишет по следующему адресу 4-х байтовое
+значение, которое представляет собой модифицированный адрес кода, который мы
+хотим выполнять после включения. Символ <code>reset_exception_handler</code> к нам пришёл
+из <code>loop.o</code>. Как было описано в первой части, этот адрес должен иметь
+выставленный единичный бит, поэтому мы его и выставляем с помощью операции
+"побитовый ИЛИ".</p>
+<p><code>. = 0x130;</code> эта команда ставит текущую позицию в выходной секции на <code>0x130</code>
+байтов. Вообще <code>.</code> это такое специальное значение, которое равно адресу, куда
+линкер сейчас будет что-то писать. Изначально оно равно <code>0</code>, после первых 4
+байтов оно равно 4, после следующих 4 байтов оно равно 8, ну а после
+присваивания оно равно <code>0x130</code> и последующие данные будут писаться уже с этим
+смещением. Почему <code>0x130</code> - тоже ниже будет объяснение.</p>
+<p><code>loop.o(code)</code> это выражение берёт входной файл <code>loop.o</code>, берёт в нём секцию
+<code>code</code> и копирует её содержимое в выходную секцию. Кроме того линкер делает то,
+ради чего его, собственно, и используют. Он понимает, что
+<code>reset_exception_handler</code> уже равен не <code>0</code>, а <code>0x0800_0130</code> и в нужном месте
+запишет правильный адрес. Если у нас есть несколько функций в разных файлах,
+которые вызывают друг друга, то линкер разберётся, у какой функции какой
+итоговый адрес и правильно всё скомпонует. Если вы видели в других линкер
+скриптах выражение вроде <code>*(.text)</code>, то это примерно то же: <code>*</code> это все файлы,
+<code>.text</code> это название секции, которую принято использовать для кода. Но в данном
+примере всё указано максимально явно и для наглядности использовано
+нестандартное название секции.</p>
+<p>Линкер запускается командой:</p>
+<pre><code>arm-none-eabi-ld -T loop.ld -o loop.elf loop.o
+</code></pre>
+<p>Если не было допущено никаких ошибок, то у нас получится файл <code>loop.elf</code>. По
+расширению, наверное, очевидно, что это объектный файл в формате ELF (как и
+<code>loop.o</code>). Если его просмотреть с помощью <code>nm</code> и <code>objdump</code>, то можно увидеть
+следующее:</p>
+<pre><code>$ arm-none-eabi-nm loop.elf
+08000130 R reset_exception_handler
+
+$ arm-none-eabi-objdump -D loop.elf
+
+loop.elf:     file format elf32-littlearm
+
+
+Disassembly of section flash:
+
+08000000 &lt;reset_exception_handler-0x130&gt;:
+ 8000000:   20005000    andcs   r5, r0, r0
+ 8000004:   08000131    stmdaeq r0, {r0, r4, r5, r8}
+    ...
+
+08000130 &lt;reset_exception_handler&gt;:
+ 8000130:   f100 0001   add.w   r0, r0, #1
+ 8000134:   f7ff fffc   bl  8000130 &lt;reset_exception_handler&gt;
+
+Disassembly of section .ARM.attributes:
+
+00000000 &lt;.ARM.attributes&gt;:
+   0:   00002041    andeq   r2, r0, r1, asr #32
+   4:   61656100    cmnvs   r5, r0, lsl #2
+   8:   01006962    tsteq   r0, r2, ror #18
+   c:   00000016    andeq   r0, r0, r6, lsl r0
+  10:   726f4305    rsbvc   r4, pc, #335544320  @ 0x14000000
+  14:   2d786574    cfldr64cs   mvdx6, [r8, #-464]! @ 0xfffffe30
+  18:   0600334d    streq   r3, [r0], -sp, asr #6
+  1c:   094d070a    stmdbeq sp, {r1, r3, r8, r9, sl}^
+  20:   Address 0x20 is out of bounds.
+</code></pre>
+<p>Как видно, этот файл тоже экспортирует символ <code>reset_exception_handler</code>, но
+теперь уже со значением <code>0x0800_0130</code>. В этом файле имеются две секции <code>flash</code> и
+<code>.ARM.attributes</code>. Последнюю мы так же проигнорируем, а вот в секции <code>flash</code>
+записано то, что мы и хотели получить. <code>objdump -D</code> пытается дизассемблировать
+первые 8 байтов, и у него даже что-то получается, но, конечно, это не команды, а
+адреса. А вот то, что начинается с адреса <code>0x0800_0130</code> это уже самый, что ни на
+есть, машинный код для ARM.</p>
+<p>Но остаётся одна маленькая проблема. Как в самом начале было написано, файл
+прошивки должен занимать 312 байтов. А у нас вроде эти байты и есть, но они не
+пойми где, а весь elf файл занимает 4864 байтов, в общем не совсем то. Чтобы
+вытащить конечную прошивку, используется команда objcopy:</p>
+<pre><code>arm-none-eabi-objcopy -O binary -j flash loop.elf loop.bin
+</code></pre>
+<p><code>-O binary</code> говорит о том, что мы хотим получить бинарный формат на выходе.
+<code>-j flash</code> говорит, что нас интересует только секция <code>flash</code> (этот флаг
+избыточен, когда у нас только одна не-служебная секция, но пусть будет для
+ясности).</p>
+<p>Теперь посмотрим, что получилось:</p>
+<pre><code>ls -l loop.bin
+-rwxr-xr-x. 1 vbezhenar vbezhenar 312 Sep  9 11:30 loop.bin
+
+hexdump -C loop.bin
+00000000  00 50 00 20 31 01 00 08  00 00 00 00 00 00 00 00  |.P. 1...........|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000130  00 f1 01 00 ff f7 fc ff                           |........|
+00000138
+</code></pre>
+<p>Ну, собственно, 312 ожидаемых байтов и внутри что-то, похожее на правду. В
+кодировке little-endian число <code>0x2000_5000</code> кодируется байтами в обратном
+порядке: <code>00 50 00 20</code>, а число <code>0x0800_0131</code> кодируется байтами <code>31 01 00 08</code>.</p>
+<p>Пора заливать эту прошивку в микроконтроллер:</p>
+<pre><code>st-flash write loop.bin 0x08000000
+st-flash 1.7.0
+2023-09-09T11:36:28 WARN common.c: NRST is not connected
+2023-09-09T11:36:28 INFO common.c: F1xx Medium-density: 20 KiB SRAM, 64 KiB flash in at least 1 KiB pages.
+file loop.bin md5 checksum: 20b87b3b138d91c38b47d29d95f773b, stlink checksum: 0x0000058d
+2023-09-09T11:36:28 INFO common.c: Attempting to write 312 (0x138) bytes to stm32 address: 134217728 (0x8000000)
+2023-09-09T11:36:28 INFO common.c: Flash page at addr: 0x08000000 erased
+2023-09-09T11:36:28 INFO common.c: Finished erasing 1 pages of 1024 (0x400) bytes
+2023-09-09T11:36:28 INFO common.c: Starting Flash write for VL/F0/F3/F1_XL
+2023-09-09T11:36:28 INFO flash_loader.c: Successfully loaded flash loader in sram
+2023-09-09T11:36:28 INFO flash_loader.c: Clear DFSR
+  1/  1 pages written
+2023-09-09T11:36:28 INFO common.c: Starting verification of write complete
+2023-09-09T11:36:28 INFO common.c: Flash written and verified! jolly good!
+</code></pre>
+<p>Собственно: всё. Прошивка залита в микроконтроллер, он перезагрузился и теперь
+крутится в вечном цикле, немножко согревая воздух. Теперь к нему можно
+подключиться через <code>st-util</code> и <code>gdb</code> и проверить, что там происходит, в первой
+части это и было описано.</p>
+<p>Теперь пару моментов. Во-первых почему именно такое значение мы пишем в регистр
+<code>sp</code>. Вообще стек это такая структура данных, и если вдруг вы не знаете, что это
+такое, то проглядите <a href="https://ru.wikipedia.org/wiki/Стек">википедию</a>, прежде чем
+продолжать. Эта структура данных настолько важна, что в процессоре есть
+отдельные регистры и команды для работы с ним, т.н. аппаратный стек. Вопреки
+интуитивному представлению, аппаратный стек растёт "сверху вниз", или от больших
+адресов к меньшим. Регистр <code>sp</code> хранит адрес, куда было записано последнее
+значение. Команда <code>push {r0}</code> сначала уменьшает значение <code>sp</code> на 4, а потом
+записывает в память по адресу <code>$sp</code> значение <code>$r0</code>. Команда <code>pop {r1}</code> сначала
+присваивает регистру <code>r1</code> значение из памяти по адресу <code>$sp</code>, а потом
+увеличивает значение регистра <code>sp</code> на 4. На саммом деле не обязательно
+устанавливать <code>sp</code> именно в конце, для стека можно выделить любой удобный
+участок оперативной памяти, но в простых программах разумно стеку отдать верхнюю
+часть памяти, с большими адресами, а свои переменные располагать в нижней части
+памяти, с меньшими адресами.</p>
+<p>В нашей простейшей программе стек не используется, поэтому регистр <code>sp</code> можно
+инициализировать любым значеним. Но почти в любой нетривиальной программе стек
+обязательно будет использоватья.</p>
+<p>Во-вторых откуда взялось число <code>0x130</code>, почему бы нам не расположить наш код
+сразу же со смещением 8. На самом деле это можно сделать и всё будет работать в
+данном конкретном случае. Но в общем случае так делать не нужно. В начале
+адресного пространства расположена т.н. таблица векторов (название странное, не
+ищите в нём смысл). Правильней было бы её назвать таблицей указателей на
+обработчики исключений. Сразу скажу, что это не исключения из C++, это
+исключения процессора. Некоторые исключения вызываются прерываниями, некоторые
+исключения вызываются по другим причинам. К примеру если вы попробуете скормить
+процессору какую-нибудь дичь, то вызовется исключение под названием usage fault.
+Когда процессор вызывает исключение, он приостанавливает текущий код (который,
+кстати, может обрабатывать другое исключение), находит адрес обработчика
+исключений в таблице векторов, проверяет, что у этого адреса младший бит
+выставлен в единицу и вызывает функцию с этим адресом.</p>
+<p>Например по смещению <code>0x0000 000c</code> расположен адрес обработчика исключения
+<code>hard fault</code>.</p>
+<p>Число обработчиков исключений для разных моделей процессоров разное, для
+STM32F103 эту информацию можно посмотреть в Reference Manual, раздел 10.1.2,
+таблица 63. Там видно, что адрес последнего обработчика <code>DMA2_Channel4_5</code> равен
+<code>0x0000_012C</code>. Прибавим 4 и получим "свободную" память по адресу <code>0x0000_0130</code>.
+В первом разделе мы выяснили, что флеш память доступна с адреса <code>0x0800_0000</code>, а
+при загрузке с флеш-памяти она также доступна с адреса <code>0x0000_0000</code>. Отсюда и
+взялся этот <code>0x0800_0130</code>.</p>
+<p>И напоследок давайте напишем Makefile. Команды выше, конечно, простые и в целом
+понятные, отрабатывают за тысячные доли секунды, но всё же для организации
+процесса сборки разумно использовать make.</p>
+<p><code>Makefile</code>:</p>
+<pre><code>loop.bin: loop.elf
+    arm-none-eabi-objcopy -O binary -j flash loop.elf loop.bin
+
+flash: loop.bin
+    st-flash write loop.bin 0x08000000
+
+loop.elf: loop.ld loop.o
+    arm-none-eabi-ld -T loop.ld -o loop.elf loop.o
+
+loop.o: loop.s
+    arm-none-eabi-as -o loop.o loop.s
+
+clean:
+    rm -f loop.o loop.elf loop.bin
+</code></pre>
+<p>Каждое правило имеет вид</p>
+<pre><code>target-file: source-file1 source-file2
+    program argument1 argument2 ...
+</code></pre>
+<p>Очень важно, что во второй строчке для отступа использутся символ табуляции, не
+пробелы. Убедитесь, что ваш редактор настроен правильно.</p>
+<p>Схема работы make очень простая:</p>
+<ol>
+<li>Если в Makefile-е есть правило для сборки <code>source-file</code>, то сначала
+   запускается оно. Что-то вроде рекурсии.</li>
+<li>Если <code>target-file</code> отсутствует или его дата модификации меньше даты
+   модификации одного из <code>source-file</code>-ов, то <code>make</code> запускает указанную команду
+   со второй строчки.</li>
+</ol>
+<p>Конечно у GNU make на самом деле функционала несоизмеримо больше, и в сложных
+программах этот функционал может быть весьма полезен.</p>
+<p>Если мы запустим <code>make loop.bin</code> в первый раз, то выполняются все нужные
+команды:</p>
+<pre><code>make loop.bin
+arm-none-eabi-as -o loop.o loop.s
+arm-none-eabi-ld -T linker.ld -o loop.elf loop.o
+arm-none-eabi-objcopy -O binary -j flash loop.elf loop.bin
+</code></pre>
+<p>Если запустим во второй раз, то <code>make</code> ничего не будет делать:</p>
+<pre><code>make loop.bin
+make: 'loop.bin' is up to date.
+</code></pre>
+<p>Если изменим дату модификации одного из исходных файлов, то <code>make</code> выполнит
+часть команд:</p>
+<pre><code>touch linker.ld
+make loop.bin
+arm-none-eabi-ld -T linker.ld -o loop.elf loop.o
+arm-none-eabi-objcopy -O binary -j flash loop.elf loop.bin
+</code></pre>
+<p><code>loop.s</code> не изменился, значит <code>loop.o</code> пересобирать нет нужды.</p>
+<p>Внимательный читатель может увидеть, что файлов <code>clean</code> и <code>flash</code> у нас в
+проекте нет, а правила есть. Это т.н. phony targets, им никакие файлы не
+соответствуют, а нужны они просто для удобства. Набрали <code>make clean</code> и почистили
+директорию.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      
+    
+  </body>
+</html>
